@@ -36,6 +36,7 @@ package
 			graphic = pic;
 			
 			eat = new Sfx(EAT);
+			eat.volume = .8;
 			
 			className = "Cow";
 			

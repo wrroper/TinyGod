@@ -50,8 +50,10 @@ package
 			credbtn = new PunkButton(600, 550, 110, 20, "Credits", ShowCredits);
 			add(credbtn);
 			
-			credits = new PunkTextArea("                                Credits\n\nProgramming/Design: Ryan Roper\n\n\nThanks to: Ludum Dare #23, for the inspiration to make this.\n            Chevy Ray for his FlashPunk framework, which I used for\n            the first time this weekend.\n            Abel Troy for his Punk.UI addon, which is displaying this\n            box!\n\n            And Especially to my understanding girlfriend, Leah\n            without whom I probably wouldn't have done this.",
+			credits = new PunkTextArea("                                Credits\n\nProgramming/Design: Ryan Roper\n\n\nThanks to: Ludum Dare #23, for the inspiration to make this.\n            Chevy Ray for his FlashPunk framework, which I used for\n            the first time this weekend.\n            Abel Troy for his Punk.UI addon, which is displaying this\n            box!\n            GreaseMonkey for his cool music generator!\n\n            And Especially to my understanding girlfriend, Leah\n            without whom I probably wouldn't have done this.",
 									  100, 250, 600, 250);
+									  
+			SoundManager.StartBGMusic();
 		}
 		
 		override public function update():void 

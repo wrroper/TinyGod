@@ -101,7 +101,7 @@ package
 								 "\n Total Cows: " + String(totCow) + "\n Total Cows Created: " + String(totCowCreated) + "\n Total Dead Cows: " + String(totDeadCow) + "\n" +
 								 "\n Total Men: " + String(totMan) + "\n Total Men Created: " + String(totManCreated) + "\n Total Dead Men: " + String(totDeadMan) + "\n" +
 								 "\n Total Zombies: " + String(totZombies) + "\n\n Total Seconds to Win: " + String(secplayed);
-			stats = new PunkTextArea(statstr, 100, 250, 600, 270);
+			stats = new PunkTextArea(statstr, 100, 250, 600, 290);
 		}
 
 		private function ShowStats():void

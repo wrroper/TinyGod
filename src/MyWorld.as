@@ -21,6 +21,7 @@ package
 		
 		public static var god:God;
 		public static var level:Level;
+		public static var zomLeft:int = 0;
 		
 		private var guiPanel:PunkPanel;
 		private var lifelbl:PunkLabel;
@@ -132,6 +133,9 @@ package
 			lblNumCows.text = String(god.CowCount);
 			lblNumMen.text = String(god.ManCount);
 			
+			if (SoundManager.DGRMusicPlaying && zomLeft == 0)
+				SoundManager.ToggleDGRMusic();
+			
 			if (god.LifeForce >= lifCow && !makeCow)
 			{
 				rdoCow = new PunkRadioButton(rdoGroup, "Cow", 650, 120, 50, 20, false, "Cow", null, 0, null, true);
@@ -207,6 +211,7 @@ package
 			if (god.LifeForce > 2500)
 			{
 				FP.world = new WinScreen(god.TotGrass, god.TotDeadGrass, god.TotCows, god.TotCowsCreated, god.TotDeadCows, god.TotMen, god.TotMenCreated, god.TotDeadMen, totZombies, secPlayed);;
+				SoundManager.StopBGMusic();
 				Log.CustomMetric("Win", "Screens");
 				Log.LevelAverageMetric("Time", "MyWorld", secPlayed);
 			}
@@ -244,6 +249,7 @@ package
 					{
 						add(new Zombie(FP.rand(40), 0));
 						totZombies++;
+						zomLeft++;
 						Log.LevelCounterMetric("Zombies", "MyWorld");
 					}
 					break;
@@ -253,6 +259,7 @@ package
 					{
 						add(new Zombie(39, FP.rand(36)));
 						totZombies++;
+						zomLeft++;
 						Log.LevelCounterMetric("Zombies", "MyWorld");
 					}
 					break;
@@ -262,6 +269,7 @@ package
 					{
 						add(new Zombie(FP.rand(40), 35));
 						totZombies++;
+						zomLeft++;
 						Log.LevelCounterMetric("Zombies", "MyWorld");
 					}
 					break;
@@ -271,10 +279,13 @@ package
 					{
 						add(new Zombie(0, FP.rand(36)));
 						totZombies++;
+						zomLeft++;
 						Log.LevelCounterMetric("Zombies", "MyWorld");
 					}
 					break;
 			}
+			
+			SoundManager.ToggleDGRMusic();
 		}
 		
 		private function onRadioChange(id:String):void

@@ -37,6 +37,7 @@ package
 			super();
 			
 			zomwhoosh = new Sfx(ZOMWHOOSH);
+			zomwhoosh.volume = .7;
 						
 			pic = new Image(ZOMBIE);
 			graphic = pic;
@@ -59,6 +60,7 @@ package
 		override protected function Die():void
 		{
 			world.add(new DeadMan(x, y));
+			MyWorld.zomLeft--;
 //			MyWorld.god.LifeDied(className);			
 			world.remove(this);
 			
