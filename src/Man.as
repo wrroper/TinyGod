@@ -63,7 +63,7 @@ package
 		override protected function Die():void
 		{
 			world.add(new DeadMan(x, y));
-			MyWorld.god.LifeDied(className);			
+			GameManager.GetGod.LifeDied(className);			
 			world.remove(this);
 			
 			super.Die();
@@ -117,7 +117,7 @@ package
 				}
 				
 				zomAlarm = false;
-				if (CheckForZombies(x / 16, y / 16) && action != 1)
+				if (action != 1 && CheckForZombies(x / 16, y / 16))
 				{
 					action = 0;
 					zomAlarm = true;
@@ -307,8 +307,8 @@ package
 		override protected function HaveChild():void 
 		{
 			world.add(new Man(x / 16, y / 16));
-			MyWorld.god.NewLife("Man");
-			Log.LevelCounterMetric("ManBirths", MyWorld.god.WorldName);
+			GameManager.GetGod.NewLife("Man");
+			Log.LevelCounterMetric("ManBirths", GameManager.GetGod.WorldName);
 		}
 		
 		private function FindFood(x:int, y:int):void
@@ -324,7 +324,7 @@ package
 				{
 					nearFood = d;
 				}
-				else if ((Math.abs(nearFood.x - x) + Math.abs(nearFood.y -y)) < (Math.abs(d.x - x) + Math.abs(d.y - y)))
+				else if (Math.sqrt((nearFood.x-x)*(nearFood.x-x))+((nearFood.y-y)*(nearFood.y-y)) > Math.sqrt((d.x-x)*(d.x-x))+((d.y-y)*(d.y-y)))
 				{
 					nearFood = d;
 				}
@@ -340,7 +340,7 @@ package
 					{
 						nearCow = c;
 					}
-					else if ((Math.abs(nearCow.x - x) + Math.abs(nearCow.y -y)) < (Math.abs(c.x - x) + Math.abs(c.y - y)))
+					else if (Math.sqrt((nearCow.x-x)*(nearCow.x-x))+((nearCow.y-y)*(nearCow.y-y)) > Math.sqrt((c.x-x)*(c.x-x))+((c.y-y)*(c.y-y)))
 					{
 						nearCow = c;
 					}
@@ -362,7 +362,7 @@ package
 					{
 						nearFriend = c;
 					}
-					else if (c.Gender != this.Gender && ((Math.abs(nearFriend.x - x) + Math.abs(nearFriend.y -y)) < (Math.abs(c.x - x) + Math.abs(c.y - y))))
+					else if (c.Gender != this.Gender && (Math.sqrt((nearFriend.x-x)*(nearFriend.x-x))+((nearFriend.y-y)*(nearFriend.y-y)) > Math.sqrt((c.x-x)*(c.x-x))+((c.y-y)*(c.y-y))))
 					{
 						nearFriend = c;
 					}
@@ -384,7 +384,7 @@ package
 				{
 					nearZom = z;
 				}
-				else if (((Math.abs(nearZom.x - x) + Math.abs(nearZom.y -y)) < (Math.abs(z.x - x) + Math.abs(z.y - y))))
+				else if (Math.sqrt((nearZom.x-x)*(nearZom.x-x))+((nearZom.y-y)*(nearZom.y-y)) > Math.sqrt((z.x-x)*(z.x-x))+((z.y-y)*(z.y-y)))
 				{
 					nearZom = z;
 				}

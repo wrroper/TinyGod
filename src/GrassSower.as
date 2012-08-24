@@ -10,13 +10,12 @@ package
 	 * ...
 	 * @author Ryan Roper
 	 */
-	public class Cow extends Animal 
+	public class GrassSower extends Animal 
 	{
-		[Embed(source = 'assets/cow2.png')] private const COW:Class;
+		[Embed(source = 'assets/grasssower.png')] private const SOWER:Class;
 		
 		private var pic:Image;
-
-		private var cowThink:Number;
+		private var myThink:Number;
 		private var hungry:Number;
 		private var hunWeight:Number = 3.0;
 		private var sleep:Number;
@@ -24,49 +23,52 @@ package
 		private var horny:Number;
 		private var horWeight:Number = 1.5;
 		private var action:int = 0;
+		private var nearFriend:GrassSower;
 		private var nearFood:Point;
-		private var nearFriend:Cow;
-		private var bestFriend:Cow;
 		
-		public function Cow(startx:int, starty:int) 
+		public function GrassSower(startx:int, starty:int) 
 		{
-			pic = new Image(COW);
+			super();
+			
+			pic = new Image(SOWER);
 			graphic = pic;
 			
-			className = "Cow";
+			className = "Sower";
 			
 			nearFood = new Point( -1, -1);
 			nearFriend = null;
-			cowThink = 0;
-			this.x = startx*16;
-			this.y = starty*16;
+			myThink = 0;
+			x = (startx * 16) + 8;
+			y = (starty * 16) + 8;
 			
-			health = 10 + FP.rand(10);
-			satiated = 20 + FP.rand(80);
-			happy = 30 + FP.rand(30);
+			health = 5 + FP.rand(10);
+			maxhealth = health + FP.rand(10);
+			satiated = 40;
+			happy = 20 + FP.rand(20);
 			awake = 20 + FP.rand(80);
+			
 		}
 		
 		override protected function Die():void
 		{
-			world.add(new DeadCow(x, y));
-			GameManager.GetGod.LifeDied(className);
+			GameManager.GetGod.LifeDied(className);			
 			world.remove(this);
 			
 			super.Die();
 		}
-		
+				
 		override public function update():void 
 		{	
-			cowThink += .016;
+			myThink += .016;
 			
-			if (cowThink > 2)
+			if (myThink > 2)
 			{
-				cowThink -= 2;
+				myThink -= 2;
+
 				
 				satiated -= FP.random * 5;
-				awake -= FP.random * 4;
-				happy -= FP.random * 2;
+				//awake -= FP.random * 3;
+				//happy -= FP.random * 4;
 				
 				if (satiated < 40)
 				{
@@ -101,41 +103,31 @@ package
 				{
 					action = 0;
 				}
+				
 			}
 			
 			switch(action)
 			{
 				case 0: // idle
-					x += FP.rand(3) - 1;
-					y += FP.rand(3) - 1;
+						x += FP.rand(3) - 1;
+						y += FP.rand(3) - 1;
 					break;
 				case 1: // EAT!
-					if (GameManager.GetLevel.Tiles.getTile((x+8) / 16, (y+8) / 16) == 1) // If I'm standing on grass, EAT!
+					if (GameManager.GetLevel.Tiles.getTile((x+8) / 16, (y+8) / 16) == 2) // If I'm standing on Dirt, sow!
 					{
 						//trace("Munch, munch!");
-						satiated += 10 + FP.rand(20);
-						happy += FP.rand(10);
-						GameManager.GetLevel.SetTile((x + 8) / 16, (y + 8) / 16, 1);
+						satiated += 1;
+						happy += 1;
+						GameManager.GetLevel.SetTile((x + 8) / 16, (y + 8) / 16, 0);
 						nearFood.x = -1;
 						nearFood.y = -1;
-						GameManager.GetGod.LifeDied("Grass");
-						SoundManager.PlaySound("GRASSEAT");
-					}
-					else if (GameManager.GetLevel.Tiles.getTile((x+8) / 16, (y+8) / 16) == 3) // If I'm standing on grass, EAT!
-					{
-						//trace("Munch, munch!");
-						satiated += 0; // Evil purple grass doesn't fill us.
-						happy -= 3;    // And it makes us sad.
-						GameManager.GetLevel.SetTile((x + 8) / 16, (y + 8) / 16, 1);
-						nearFood.x = -1;
-						nearFood.y = -1;
-						GameManager.GetGod.LifeDied("PurpleGrass");
-						SoundManager.PlaySound("GRASSEAT");
+						GameManager.GetGod.NewLife("Grass");
+						//SoundManager.PlaySound("GRASSEAT");
 					}
 					else
 					{
 						var tmp:int = GameManager.GetLevel.Tiles.getTile(nearFood.x, nearFood.y);
-						if ((nearFood.x == -1 && nearFood.y == -1) || ((GameManager.GetLevel.Tiles.getTile(nearFood.x, nearFood.y) != 1) && GameManager.GetLevel.Tiles.getTile(nearFood.x, nearFood.y) != 3)) // Is the tile Im craving food and still there?
+						if ((nearFood.x == -1 && nearFood.y == -1) || GameManager.GetLevel.Tiles.getTile(nearFood.x, nearFood.y) != 2) // Is the tile Im craving food and still there?
 						{
 							FindFood(x / 16, y / 16);
 						}
@@ -169,7 +161,7 @@ package
 					if (nearFriend == null || nearFriend.Health < 1)
 					{
 						nearFriend = null;
-						FindCows(x / 16, y / 16);
+						FindSower(x / 16, y / 16);
 					}
 					else
 					{
@@ -208,12 +200,9 @@ package
 		
 		override protected function HaveChild():void 
 		{
-			if (world)
-			{
-				world.add(new Cow(x / 16, y / 16));
-				GameManager.GetGod.NewLife("Cow");
-				Log.LevelCounterMetric("CowBirths", GameManager.GetGod.WorldName);
-			}
+			world.add(new Man(x / 16, y / 16));
+			GameManager.GetGod.NewLife("Sower");
+			Log.LevelCounterMetric("SowerBirths", GameManager.GetGod.WorldName);
 		}
 		
 		private function FindFood(x:int, y:int):void
@@ -224,14 +213,14 @@ package
 			{
 				for (var j:int = 0; j < GameManager.GetLevel.Tiles.rows; j++)
 				{
-					if ((GameManager.GetLevel.Tiles.getTile(i, j) == 1) || (GameManager.GetLevel.Tiles.getTile(i, j) == 3))
+					if (GameManager.GetLevel.Tiles.getTile(i, j) == 2)
 					{
 						if (closest.x == -1 && closest.y == -1)
 						{
 							closest.x = i;
 							closest.y = j;
 						}
-						else if (Math.sqrt((closest.x-x)*(closest.x-x))+((closest.y-y)*(closest.y-y)) > Math.sqrt((closest.x-i)*(closest.x-i))+((closest.y-j)*(closest.y-j)))
+						else if (Math.sqrt((closest.x-x)*(closest.x-x))+((closest.y-y)*(closest.y-y)) > Math.sqrt((closest.x-i)*(closest.x-i))+((closest.y-j)*(closest.y-j)))  // (Math.abs(closest.x - x) + Math.abs(closest.y - y) > Math.abs(closest.x - i) + Math.abs(closest.y - j))
 						{
 							closest.x = i;
 							closest.y = j;
@@ -252,13 +241,13 @@ package
 			}
 		}
 		
-		private function FindCows(x:int, y:int):void
+		private function FindSower(x:int, y:int):void
 		{
-			var cowList:Array = [];
+			var sowerList:Array = [];
 			
-			world.getClass(Cow, cowList);
+			world.getClass(GrassSower, sowerList);
 			
-			for each(var c:Cow in cowList)
+			for each(var c:GrassSower in sowerList)
 			{
 				if (c != this)
 				{
@@ -266,13 +255,13 @@ package
 					{
 						nearFriend = c;
 					}
-					else if (Math.sqrt((nearFriend.x-x)*(nearFriend.x-x))+((nearFriend.y-y)*(nearFriend.y-y)) > Math.sqrt((c.x-x)*(c.x-x))+((c.y-y)*(c.y-y)))
+					else if ((Math.abs(nearFriend.x - x) + Math.abs(nearFriend.y -y)) < (Math.abs(c.x - x) + Math.abs(c.y - y)))
 					{
 						nearFriend = c;
 					}
 				}
 			}
-		}
+		}		
 	}
 
 }

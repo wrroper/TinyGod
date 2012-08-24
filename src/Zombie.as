@@ -13,10 +13,8 @@ package
 	public class Zombie extends Animal
 	{
 		[Embed(source = 'assets/zombie.png')] private const ZOMBIE:Class;
-		[Embed(source = 'sounds/whoosh.mp3')] private const ZOMWHOOSH:Class;
 
 		private var pic:Image;
-		private var zomwhoosh:Sfx;
 
 		private var myThink:Number;
 		private var hungry:Number;
@@ -35,9 +33,6 @@ package
 		public function Zombie(startx:int, starty:int) 
 		{
 			super();
-			
-			zomwhoosh = new Sfx(ZOMWHOOSH);
-			zomwhoosh.volume = .7;
 						
 			pic = new Image(ZOMBIE);
 			graphic = pic;
@@ -54,18 +49,19 @@ package
 			happy = 60 + FP.rand(20);
 			awake = 80;
 			
-			zomwhoosh.play();
+			SoundManager.PlaySound("ZOMWHOOSH", false);
+			//zomwhoosh.play();
 		}
 		
 		override protected function Die():void
 		{
 			world.add(new DeadMan(x, y));
 			MyWorld.zomLeft--;
-//			MyWorld.god.LifeDied(className);			
+//			GameManager.GetGod.LifeDied(className);			
 			world.remove(this);
 			
 			super.Die();
-			Log.LevelCounterMetric("ZombieKills", MyWorld.god.WorldName);
+			Log.LevelCounterMetric("ZombieKills", GameManager.GetGod.WorldName);
 		}
 				
 		override public function update():void 
@@ -252,7 +248,7 @@ package
 				{
 					nearFood = d;
 				}
-				else if ((Math.abs(nearFood.x - x) + Math.abs(nearFood.y -y)) < (Math.abs(d.x - x) + Math.abs(d.y - y)))
+				else if (Math.sqrt((nearFood.x-x)*(nearFood.x-x))+((nearFood.y-y)*(nearFood.y-y)) > Math.sqrt((d.x-x)*(d.x-x))+((d.y-y)*(d.y-y)))
 				{
 					nearFood = d;
 				}
@@ -260,7 +256,6 @@ package
 			
 			if (nearFood == null || vegZom >= .85)
 			{
-				nearFood = null;
 				world.getClass(Cow, cowList);
 				
 				for each(var c:Cow in cowList)
@@ -269,11 +264,13 @@ package
 					{
 						nearCow = c;
 					}
-					else if ((Math.abs(nearCow.x - x) + Math.abs(nearCow.y -y)) < (Math.abs(c.x - x) + Math.abs(c.y - y)))
+					else if (Math.sqrt((nearCow.x-x)*(nearCow.x-x))+((nearCow.y-y)*(nearCow.y-y)) > Math.sqrt((c.x-x)*(c.x-x))+((c.y-y)*(c.y-y)))
 					{
 						nearCow = c;
 					}
 				}
+				if (nearCow != null)
+					nearFood = null;
 			}
 		}
 		
@@ -289,7 +286,7 @@ package
 				{
 					nearFriend = c;
 				}
-				else if (((Math.abs(nearFriend.x - x) + Math.abs(nearFriend.y -y)) < (Math.abs(c.x - x) + Math.abs(c.y - y))))
+				else if (Math.sqrt((nearFriend.x-x)*(nearFriend.x-x))+((nearFriend.y-y)*(nearFriend.y-y)) > Math.sqrt((c.x-x)*(c.x-x))+((c.y-y)*(c.y-y)))
 				{
 					nearFriend = c;
 				}

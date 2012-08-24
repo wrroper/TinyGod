@@ -10,10 +10,6 @@ package
 	 */
 	public class Animal extends Entity 
 	{
-		[Embed(source = 'sounds/thud.mp3')] private const THUD:Class;
-
-		public var attack:Sfx;
-		
 		protected var pregTime:Number = 50;
 		
 		protected var health:int;
@@ -33,8 +29,6 @@ package
 		{
 			gender = FP.rand(2);
 			maxhealth = 100;
-			
-			attack = new Sfx(THUD);
 		}
 		
 		protected function Die():void
@@ -67,7 +61,7 @@ package
 			
 			if (satiated < 1)
 			{
-				trace("Im starving!!!");
+				//trace("Im starving!!!");
 				health -= 1;
 			}
 				
@@ -118,8 +112,7 @@ package
 				world.add(new BloodSplat(x, y));
 			}
 			trace("Ouch!");
-			if(!attack.playing)
-				attack.play();
+			SoundManager.PlaySound("THUD");
 		}
 		
 		public function get Health():int

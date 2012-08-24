@@ -12,26 +12,51 @@ package
 	 */
 	public class Level extends Entity 
 	{
-		[Embed(source = 'assets/tilemap.png')] private const TMAP:Class;
+		[Embed(source = 'assets/tilemap.png')] protected const TMAP:Class;
 		
-		private var tiles:Tilemap;
-		private var tmap:Image;
-		private var colGrid:Grid;
+		protected var tiles:Tilemap;
+		protected var tmap:Image;
+		protected var colGrid:Grid;
+		
+		protected var startPlayerPower:int;
+		protected var maxPlayerPower:int;
+		protected var startPlayerForce:int;
 		
 		public function Level() 
 		{
+			startPlayerPower 	= 200;
+			maxPlayerPower 		= 200;
+			startPlayerForce 	= 0;
+			
 			//tmap = new Image(TMAP);
 			tiles = new Tilemap(TMAP, 640, 576, 16, 16);
 			graphic = tiles;
 			layer = 1;
 
-			tiles.setRect(0, 0, 640 / 16, 576 / 16, 2); 
+			// this should be done in each level.
+			tiles.setRect(0, 0, 640 / 16, 576 / 16, 0); 
+
 			//tiles.setRect(3, 3, 3, 5, 0);
 			
 			//colGrid = new Grid(640, 576, 16, 16, 0, 0);
 			//mask = colGrid;
 			
 			//colGrid.setRect(3, 3, 3, 5, true);
+		}
+
+		public function get GetStartingPlayerPower():int
+		{
+			return startPlayerPower;
+		}
+		
+		public function get GetMaxPlayerPower():int
+		{
+			return maxPlayerPower;
+		}
+		
+		public function get GetStartingPlayerForce():int
+		{
+			return startPlayerForce;
 		}
 		
 		public function get Tiles():Tilemap

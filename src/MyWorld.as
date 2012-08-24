@@ -19,8 +19,6 @@ package
 	public class MyWorld extends World 
 	{
 		
-		public static var god:God;
-		public static var level:Level;
 		public static var zomLeft:int = 0;
 		
 		private var guiPanel:PunkPanel;
@@ -30,12 +28,13 @@ package
 		private var rdoGrass:PunkRadioButton;
 		private var rdoCow:PunkRadioButton;
 		private var rdoMan:PunkRadioButton;
-		private var rdoTrees:PunkRadioButton;
+		private var rdoSower:PunkRadioButton;
 		private var rdoGroup:PunkRadioButtonGroup;
 		private var chkSound:PunkToggleButton;		
 		private var lblNumGrass:PunkLabel;
 		private var lblNumCows:PunkLabel;
 		private var lblNumMen:PunkLabel;
+		private var lblNumSower:PunkLabel;
 		
 		private var makeGrass:Boolean;
 		private var lifGrass:int;
@@ -43,8 +42,8 @@ package
 		private var lifCow:int;
 		private var makeMan:Boolean;
 		private var lifMan:int;
-		private var makeTrees:Boolean;
-		private var lifTrees:int;
+		private var makeSower:Boolean;
+		private var lifSower:int;
 		private var zwave1:Boolean = false;
 		private var zwave2:Boolean = false;
 		private var zwave3:Boolean = false;
@@ -60,14 +59,10 @@ package
 			lifGrass = 0;
 			lifCow = 30;
 			lifMan = 300;
-			lifTrees = 100;
+			lifSower = 800;
 			countdown = 15;
 			
-			MyWorld.level = new Level;
-			add(level);
-			MyWorld.god = new God;
-			god.WorldName = "MyWorld";
-			add(god);
+			add(new GameManager);
 			
 			//add(new Cow);
 			//add(new PunkButton(10, 10, 100, 25, "Press me"));
@@ -91,6 +86,7 @@ package
 			add(lblNumGrass);
 			lblNumCows = new PunkLabel("0 ", 760, 320, 60, 10);
 			lblNumMen = new PunkLabel("0 ", 760, 340, 60, 10);
+			lblNumSower = new PunkLabel("0 ", 760, 360, 60, 10);
 			
 			hintlbl = new PunkLabel("Hints will be displayed here as you play...", 10, 580, 500, 20);
 			add(hintlbl);
@@ -127,16 +123,17 @@ package
 				secPlayed += 1;
 			}
 			
-			lifelbl.text = String(god.LifePower);
-			lifefrclbl.text = String(god.LifeForce);
-			lblNumGrass.text = String(god.GrassCount);
-			lblNumCows.text = String(god.CowCount);
-			lblNumMen.text = String(god.ManCount);
+			lifelbl.text = String(GameManager.GetGod.LifePower);
+			lifefrclbl.text = String(GameManager.GetGod.LifeForce);
+			lblNumGrass.text = String(GameManager.GetGod.GrassCount);
+			lblNumCows.text = String(GameManager.GetGod.CowCount);
+			lblNumMen.text = String(GameManager.GetGod.ManCount);
+			lblNumSower.text = String(GameManager.GetGod.SowerCount);
 			
 			if (SoundManager.DGRMusicPlaying && zomLeft == 0)
 				SoundManager.ToggleDGRMusic();
 			
-			if (god.LifeForce >= lifCow && !makeCow)
+			if (GameManager.GetGod.LifeForce >= lifCow && !makeCow)
 			{
 				rdoCow = new PunkRadioButton(rdoGroup, "Cow", 650, 120, 50, 20, false, "Cow", null, 0, null, true);
 				add(rdoCow);
@@ -148,7 +145,7 @@ package
 				Log.LevelCounterMetric("CowUnlock", "MyWorld", false);
 			}
 			
-			if (god.LifeForce >= lifMan && !makeMan)
+			if (GameManager.GetGod.LifeForce >= lifMan && !makeMan)
 			{
 				rdoMan = new PunkRadioButton(rdoGroup, "Man", 650, 140, 50, 20, false, "Man", null, 0, null, true);
 				add(rdoMan);
@@ -160,11 +157,16 @@ package
 				Log.LevelCounterMetric("ManUnlock", "MyWorld", false);
 			}
 			
-			if (god.LifeForce >= lifTrees && !makeTrees && false)
+			if (GameManager.GetGod.LifeForce >= lifSower && !makeSower)
 			{
-				rdoTrees = new PunkRadioButton(rdoGroup, "Trees", 650, 160, 50, 20, false, "Trees", null, 0, null, true);
-				add(rdoTrees);
-				makeTrees = true;
+				rdoSower = new PunkRadioButton(rdoGroup, "GrassSower", 650, 160, 50, 20, false, "GrassSower", null, 0, null, true);
+				add(rdoSower);
+				makeSower = true;
+				hintlbl.text = "You have unlocked men! You are becoming a proper god now!";
+				countdown = 10;
+				add(new PunkLabel("Sower : ", 650, 360, 60, 10));
+				add(lblNumSower);
+				Log.LevelCounterMetric("SowerUnlock", "MyWorld", false);
 			}
 			
 			if (countdown > 0)
@@ -175,7 +177,7 @@ package
 				countdown = 7.0;
 			}
 			
-			if (god.LifeForce >= 1400 && zwave1 == false)
+			if (GameManager.GetGod.LifeForce >= 1400 && zwave1 == false)
 			{
 				zwave1 = true;
 				SpawnZombieWave(1);
@@ -184,7 +186,7 @@ package
 				Log.LevelCounterMetric("ZombieWave1", "MyWorld", false);
 			}
 			
-			if (god.LifeForce >= 1800 && zwave2 == false)
+			if (GameManager.GetGod.LifeForce >= 1800 && zwave2 == false)
 			{
 				zwave2 = true;
 				SpawnZombieWave(2);
@@ -193,7 +195,7 @@ package
 				Log.LevelCounterMetric("ZombieWave2", "MyWorld", false);
 			}
 
-			if (god.LifeForce >= 2200 && zwave3 == false)
+			if (GameManager.GetGod.LifeForce >= 2200 && zwave3 == false)
 			{
 				zwave3 = true;
 				SpawnZombieWave(3);
@@ -202,15 +204,15 @@ package
 				Log.LevelCounterMetric("ZombieWave3", "MyWorld", false);
 			}
 
-			if (god.LifeForce < 0)
+			if (GameManager.GetGod.LifeForce < 0)
 			{
 				FP.world = new LoseScreen;
 				Log.CustomMetric("Lose", "Screens");
 			}
 			
-			if (god.LifeForce > 2500)
+			if (GameManager.GetGod.LifeForce > 2500 && countdown < 1 && zomLeft == 0)
 			{
-				FP.world = new WinScreen(god.TotGrass, god.TotDeadGrass, god.TotCows, god.TotCowsCreated, god.TotDeadCows, god.TotMen, god.TotMenCreated, god.TotDeadMen, totZombies, secPlayed);;
+				FP.world = new WinScreen(GameManager.GetGod.TotGrass, GameManager.GetGod.TotDeadGrass, GameManager.GetGod.TotCows, GameManager.GetGod.TotCowsCreated, GameManager.GetGod.TotDeadCows, GameManager.GetGod.TotMen, GameManager.GetGod.TotMenCreated, GameManager.GetGod.TotDeadMen, totZombies, secPlayed);;
 				SoundManager.StopBGMusic();
 				Log.CustomMetric("Win", "Screens");
 				Log.LevelAverageMetric("Time", "MyWorld", secPlayed);
@@ -221,29 +223,39 @@ package
 		
 		public function CheckHints():void
 		{
-			if (god.LifeForce == 0)
+			if (GameManager.GetGod.LifeForce == 0)
 				hintlbl.text = "A great world, even a tiny one starts with the basics! Try clicking to create grass!";
-			if (god.LifeForce > 0 && !makeCow)
+			if (GameManager.GetGod.LifeForce > 0 && !makeCow)
 				hintlbl.text = "Every god needs life force to survive, the more life the better!";
-			if (god.LifeForce > 0 && makeCow && !makeMan)
+			if (GameManager.GetGod.LifeForce > 0 && makeCow && !makeMan)
 				hintlbl.text = "Cows are nice but if you expand your power you will be able to create more complex life.";
-			if (god.LifeForce > 0 && makeCow && makeMan)
+			if (GameManager.GetGod.LifeForce > 0 && makeCow && makeMan)
+				hintlbl.text = "Beware, the more power you attain the more likely you are to draw attention.";
+			if (GameManager.GetGod.LifeForce > 0 && makeCow && makeMan && makeSower)
 				hintlbl.text = "Beware, the more power you attain the more likely you are to draw attention.";
 
-			if (god.LifeForce >= 1200)
+			if (GameManager.GetGod.LifeForce >= 1200 && GameManager.GetGod.LifeForce <= 1300)
 				hintlbl.text = "Beware, Tiny God! I feel the eyes of an elder god!";
+			if (GameManager.GetGod.LifeForce >= 1600 && GameManager.GetGod.LifeForce <= 1700)
+				hintlbl.text = "I feel his attention focused on us! Prepare!";
+			if (GameManager.GetGod.LifeForce >= 1900 && GameManager.GetGod.LifeForce <= 2100)
+				hintlbl.text = "I feel his wrath, prepare for his full might!";
+			
 		}
 		
 		private function SpawnZombieWave(wave:int):void
 		{
+			FP.randomizeSeed();
+
 			var dir:int = FP.rand(4);
 			var i:int;
 			var num:int;
 			
+			num = (FP.rand(10)+10)*wave;
+
 			switch(dir)
 			{
 				case 0:
-				num = (FP.rand(10)+10)*wave;
 					
 					for (i = 0; i < num; i++)
 					{
@@ -254,7 +266,6 @@ package
 					}
 					break;
 				case 1:
-					num = FP.rand(10 + 1);
 					for (i = 0; i < num; i++)
 					{
 						add(new Zombie(39, FP.rand(36)));
@@ -264,7 +275,6 @@ package
 					}
 					break;
 				case 2:
-					num = FP.rand(10 + 1);
 					for (i = 0; i < num; i++)
 					{
 						add(new Zombie(FP.rand(40), 35));
@@ -274,7 +284,6 @@ package
 					}
 					break;
 				case 3:
-					num = FP.rand(10 + 1);
 					for (i = 0; i < num; i++)
 					{
 						add(new Zombie(0, FP.rand(36)));
@@ -295,16 +304,16 @@ package
 			switch(id)
 			{
 				case "Grass":
-					god.LifeType = 0;
+					GameManager.GetGod.LifeType = 0;
 					break;
 				case "Cow":
-					god.LifeType = 1;
+					GameManager.GetGod.LifeType = 1;
 					break;
 				case "Man":
-					god.LifeType = 2;
+					GameManager.GetGod.LifeType = 2;
 					break;
-				case "Trees":
-					god.LifeType = 3;
+				case "GrassSower":
+					GameManager.GetGod.LifeType = 3;
 					break;
 			}
 		}

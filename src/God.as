@@ -12,25 +12,23 @@ package
 	 */
 	public class God extends Entity 
 	{
-		[Embed(source = 'sounds/whoosh2.mp3')] private const WHOOSH:Class;
-		
-		private var whoosh:Sfx;
-		
 		private var worldName:String;
 		
 		private var lifeForce:int;
 		private var lifePower:int;
+		private var maxLifePower:int;
 		private var lifeType:int;
 
 		private const costGrass:int = 1;
 		private const costCow:int = 20;
 		private const costMan:int = 50;
-		private const costTrees:int = 10;
+		private const costSower:int = 75;
 		private const lifeTick:Number = 4.0;
 		
 		private var cntGrass:int = 0;
 		private var cntCow:int = 0;
 		private var cntMan:int = 0;
+		private var cntSower:int = 0;
 		
 		private var totGrass:int = 0;
 		private var totDeadGrass:int = 0;
@@ -40,16 +38,17 @@ package
 		private var totMan:int = 0;
 		private var totManCreated:int = 0;
 		private var totDeadMan:int = 0;
+		private var totSower:int = 0;
+		private var totSowerCreated:int = 0;
+		private var totDeadSower:int = 0;
 		
 		private var tick:Number = 0;
 		
 		public function God() 
 		{
-			whoosh = new Sfx(WHOOSH);
-			whoosh.volume = 0.25;
-			
-			lifePower = 200;
-			lifeForce = 0;
+			lifePower 		= GameManager.GetLevel.GetStartingPlayerPower;
+			lifeForce 		= GameManager.GetLevel.GetStartingPlayerForce;
+			maxLifePower 	= GameManager.GetLevel.GetMaxPlayerPower;
 			lifeType = 0;
 		}
 		
@@ -65,10 +64,10 @@ package
 					lifePower += cntGrass/5;
 				if (lifePower < 150)
 					lifePower += cntCow * 2;
-				if (lifePower < 200)
+				if (lifePower < maxLifePower)
 					lifePower += cntMan * 3;
-				if (lifePower > 200)
-					lifePower = 200;
+				if (lifePower > maxLifePower)
+					lifePower = maxLifePower;
 			}
 			
 			if (Input.mousePressed || (lifeType == 0 && Input.mouseDown))
@@ -133,6 +132,11 @@ package
 		{
 			return cntMan;
 		}
+		
+		public function get SowerCount():int
+		{
+			return cntSower;
+		}
 
 		public function get TotGrass():int
 		{
@@ -174,6 +178,21 @@ package
 			return totDeadMan;
 		}
 		
+		private function get TotSower():int
+		{
+			return totSower;
+		}
+		
+		public function get TotSowerCreated():int
+		{
+			return totSowerCreated;
+		}
+		
+		public function get TotDeadSower():int 
+		{
+			return totDeadSower;
+		}
+		
 		public function LifeDied(what:String):void
 		{
 			switch(what)
@@ -196,6 +215,11 @@ package
 					totDeadMan += 1;
 					Log.LevelCounterMetric("MenDied", worldName);
 					break;
+				case "Sower":
+					lifeForce -= costSower;
+					cntSower -= 1;
+					totDeadSower -= 1;
+					Log.LevelCounterMetric("SowerDied", worldName);
 				default:
 					
 			}
@@ -215,15 +239,23 @@ package
 					lifeForce += costCow;
 					cntCow += 1;
 					totCow += 1;
+					SoundManager.PlaySound("WHOOSH", false);
 					//if(!whoosh.playing)
-						whoosh.play();
+//						whoosh.play();
 					break;
 				case "Man":
 					lifeForce += costMan;
 					cntMan += 1;
 					totMan += 1;
+					SoundManager.PlaySound("WHOOSH", false);
 					//if(!whoosh.playing)
-						whoosh.play();
+//						whoosh.play();
+					break;
+				case "Sower":
+					lifeForce += costSower;
+					cntSower += 1;
+					totSower += 1;
+					SoundManager.PlaySound("WHOOSH", false);
 					break;
 				default:
 					
@@ -242,15 +274,15 @@ package
 			if (lifePower <= 0)
 				return;
 				
-			if(!MyWorld.level.InWorld(x, y))
+			if(!GameManager.GetLevel.InWorld(x, y))
 				return;
 				
 			switch(type)
 			{
 				case 0: // Grass
-					if (MyWorld.level.Tiles.getTile(x, y) == 2)
+					if (GameManager.GetLevel.Tiles.getTile(x, y) == 2)
 					{
-						MyWorld.level.SetTile(x, y, 0);
+						GameManager.GetLevel.SetTile(x, y, 0);
 						//trace("Grow Grass Grow!")
 						lifePower -= costGrass;
 						NewLife("Grass");
@@ -277,6 +309,14 @@ package
 					}
 				break;
 				case 3: // Trees
+					if (lifePower >= costSower)
+					{
+						world.add(new GrassSower(x, y));
+						lifePower -= costSower;
+						totSowerCreated += 1;
+						NewLife("Sower");
+						Log.LevelCounterMetric("SowerCreated", worldName);
+					}
 				break;
 				default: // WTF are you creating?
 					trace("Creating something alien!");

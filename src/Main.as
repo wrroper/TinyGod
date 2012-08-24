@@ -18,7 +18,7 @@ package
 
 				super(800, 600, 60, false);
 				
-				Log.View(7723, "", "", root.loaderInfo.loaderURL);
+				Log.View(7764, "", "", root.loaderInfo.loaderURL);
 				
 				FP.world = new TitleScreen;
 		}
